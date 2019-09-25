@@ -59,14 +59,9 @@ def generador_codigos(simbolos,niveles):
     nivel_anterior = niveles[0]
     num_anterior = 0
     for nivel in niveles[1:]:
-        if nivel == nivel_anterior:
-            num_anterior += 1
-            nivel_anterior = nivel
-            codigos.append(num_anterior)
-        else:
-            num_anterior = 2 ** (nivel - nivel_anterior) * (num_anterior + 1)
-            nivel_anterior = nivel
-            codigos.append(num_anterior)
+        num_anterior = 2 ** (nivel - nivel_anterior) * (num_anterior + 1)
+        nivel_anterior = nivel
+        codigos.append(num_anterior)
     codigos_bin = []
     for nivel, codigo in zip(niveles,codigos):
         c_bin = str(bin(codigo))[2:]
@@ -90,9 +85,6 @@ codigo = generador_codigos(simbolos, niveles)
 codigos_por_nivel = []
 min_nivel = min(niveles)
 max_nivel = max(niveles)
-print(simbolos)
-print(niveles)
-print(codigo)
 for i in range(min_nivel,max_nivel + 1):
     codigos_por_nivel.append(str(niveles.count(i)))
 
