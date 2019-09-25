@@ -1,15 +1,26 @@
 #!/usr/bin/python3
 
 def frecuencias(fichero):
+    global cadena
     dicc = {}
     with open(fichero,'rt') as f:
-        #TODO: PROBAR LAS DOS OPCIONES (LETRA A LETRA, LINEA A LINEA, EL FICHERO ENTERO, COUNTER DE COLLECTIONS 
-        for linea in f:
-            for caracter in linea:
-                if not (caracter in dicc.keys()):
-                    dicc[caracter] = 1
-                else:
-                    dicc[caracter] += 1
+        #TODO: PROBAR LAS DOS OPCIONES ( LINEA A LINEA, EL FICHERO ENTERO, COUNTER DE COLLECTIONS 
+        #------------------OPCION 1---------------------
+#        for linea in f:
+#            for caracter in linea:
+#                if not (caracter in dicc.keys()):
+#                    dicc[caracter] = 1
+#                else:
+#                    dicc[caracter] += 1
+        #------------------OPCION 2---------------------
+#        cadena = f.read()
+#        for caracter in set(cadena):
+#            dicc[caracter] = cadena.count(caracter)
+        #-----------------OPCION 3______________________
+        from collections import Counter
+        cadena = f.read()
+        dicc = Counter(cadena)
+
     lista_frecuencias = sorted(dicc.items(),key = lambda x: x[1], reverse = True)
     return lista_frecuencias
 
@@ -41,6 +52,9 @@ def calculo_niveles(lista):
     return list(zip(*resultado))
 
 def generador_codigos(simbolos,niveles):
+    #IMPORTANTE: EL NIVEL MINIMO MARCA EL NUMERO DE BITS DEL NIVEL INICIAL, AL EMPEZARSE EN 0 SE DEBEN AÑADIR 0s HASTA ALCANZAR EL NUMERO DE BITS.
+
+    #IMPORTANTE: SI UN NIVEL ESTA VACIO SE ROMPE LA NORMA QUE INFIERO DE LOS APUNTES, POR CADA NIVEL SE DEBE AÑADIR UN 0 A LA DERECHA AL NUMERO BINARIO O LO QUE ES LO MISMO MULTIPLICAR POR DOS EN DECIMAL.
     codigos = [0]
     nivel_anterior = niveles[0]
     num_anterior = 0
@@ -50,8 +64,8 @@ def generador_codigos(simbolos,niveles):
             nivel_anterior = nivel
             codigos.append(num_anterior)
         else:
+            num_anterior = 2 ** (nivel - nivel_anterior) * (num_anterior + 1)
             nivel_anterior = nivel
-            num_anterior = 2 * (num_anterior+1)
             codigos.append(num_anterior)
     codigos_bin = []
     for nivel, codigo in zip(niveles,codigos):
@@ -59,21 +73,26 @@ def generador_codigos(simbolos,niveles):
         if len(c_bin) < nivel:
             # El nivel de ese caracter debe coincidir con el largo de la cadena de bits, por ejemplo si el primer caracter esta en el nivel 2, le corresponde el 00 no el 0
             # Para solucionarlo añadimos ceros a la izquierda
+            # TODO: CAMBIAR ESTO A ALGO MAS ELELGANTE
             codigos_bin.append("0" * (nivel - len(c_bin)) + c_bin)
         else:
             codigos_bin.append(c_bin)
     return {simbolo: c_bin for simbolo,c_bin in zip(simbolos,codigos_bin) }
 
-x = frecuencias("./dna.50MB/dna.50MB")
+lista = frecuencias("./dna.50MB")
 #cadena = "panamabanana"
 #lista = frecuencias_ejemplo(cadena)
-lista = frecuencias(x)
+
 #lista = sorted(lista,key=lambda x: x[1],reverse=True)
+
 simbolos, niveles = calculo_niveles(lista)
 codigo = generador_codigos(simbolos, niveles)
 codigos_por_nivel = []
 min_nivel = min(niveles)
 max_nivel = max(niveles)
+print(simbolos)
+print(niveles)
+print(codigo)
 for i in range(min_nivel,max_nivel + 1):
     codigos_por_nivel.append(str(niveles.count(i)))
 
