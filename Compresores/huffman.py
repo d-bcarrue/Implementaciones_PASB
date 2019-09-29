@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+import sys
+
 def frecuencias(fichero):
     global cadena
     dicc = {}
@@ -52,8 +54,6 @@ def calculo_niveles(lista):
     return list(zip(*resultado))
 
 def generador_codigos(simbolos,niveles):
-    #IMPORTANTE: EL NIVEL MINIMO MARCA EL NUMERO DE BITS DEL NIVEL INICIAL, AL EMPEZARSE EN 0 SE DEBEN AÑADIR 0s HASTA ALCANZAR EL NUMERO DE BITS.
-
     #IMPORTANTE: SI UN NIVEL ESTA VACIO SE ROMPE LA NORMA QUE INFIERO DE LOS APUNTES, POR CADA NIVEL SE DEBE AÑADIR UN 0 A LA DERECHA AL NUMERO BINARIO O LO QUE ES LO MISMO MULTIPLICAR POR DOS EN DECIMAL.
     codigos = [0]
     nivel_anterior = niveles[0]
@@ -68,13 +68,13 @@ def generador_codigos(simbolos,niveles):
         if len(c_bin) < nivel:
             # El nivel de ese caracter debe coincidir con el largo de la cadena de bits, por ejemplo si el primer caracter esta en el nivel 2, le corresponde el 00 no el 0
             # Para solucionarlo añadimos ceros a la izquierda
-            # TODO: CAMBIAR ESTO A ALGO MAS ELELGANTE
+            # TODO: CAMBIAR ESTO A ALGO MAS ELEGANTE
             codigos_bin.append("0" * (nivel - len(c_bin)) + c_bin)
         else:
             codigos_bin.append(c_bin)
     return {simbolo: c_bin for simbolo,c_bin in zip(simbolos,codigos_bin) }
 
-lista = frecuencias("./dna.50MB")
+lista = frecuencias(sys.argv[1])
 #cadena = "panamabanana"
 #lista = frecuencias_ejemplo(cadena)
 
@@ -87,12 +87,14 @@ min_nivel = min(niveles)
 max_nivel = max(niveles)
 for i in range(min_nivel,max_nivel + 1):
     codigos_por_nivel.append(str(niveles.count(i)))
+# Solucion temporal, un archivo por lista
+with open(sys.argv[1] + ".sim","wt") as fichero:
+    fichero.write(''.join(simbolos))
 
-with open("prueba.txt","wt") as fichero:
-        #RECUERDA ESTO, CUANDO VAYAS A DECODIFICAR, EL RETORNO DE CARRO LO TIENES QUE TENER CUENTA
-    fichero.write(''.join(simbolos)+'\n')
-    fichero.write(','.join([str(min_nivel),str(max_nivel)])+ '\n')
-    fichero.write(','.join(codigos_por_nivel)+'\n')
+with open(sys.argv[1] + ".nvl","wt") as fichero:
+    fichero.write(','.join([str(min_nivel),str(max_nivel)])+ ',')
+    fichero.write(','.join(codigos_por_nivel))
+
+with open(sys.argv[1] + ".cmp","wt") as fichero:
     for letra in cadena:
         fichero.write(codigo[letra])
-
